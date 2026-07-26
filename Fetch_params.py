@@ -20,7 +20,7 @@ MAX_PROCESSES = multiprocessing.cpu_count()
 BACKOFF_FACTOR = 5
 MAX_RETRIES = 5
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "input_params")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # -- GAQL Queries WITH DATE PLACEHOLDERS --
@@ -28,7 +28,6 @@ MASTER_CAMPAIGN_AD_GROUP_QUERY = """
     SELECT 
         campaign.id,
         ad_group.id,
-        customer.id,
         metrics.impressions,
         metrics.clicks,
         metrics.cost_micros,
@@ -378,7 +377,6 @@ def issue_search_request(client, customer_id, query, query_name):
                         row_data = {
                             "campaign_id": row.campaign.id,
                             "ad_group_id": row.ad_group.id,
-                            "customer_id": row.customer.id, 
                             "Date": row.segments.date,
                             "impressions": row.metrics.impressions,
                             "clicks": row.metrics.clicks,
@@ -668,7 +666,9 @@ if __name__ == "__main__":
     start_date_str = start_date.strftime('%Y-%m-%d')
     end_date_str = end_date.strftime('%Y-%m-%d')
 
-    client = GoogleAdsClient.load_from_storage('/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/google-ads.yaml')
+    # Use the correct path to google-ads.yaml in the same directory
+    config_path = os.path.join(os.path.dirname(__file__), 'google-ads.yaml')
+    client = GoogleAdsClient.load_from_storage(config_path)
     if args.login_customer_id:
         client.login_customer_id = args.login_customer_id
 
