@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-input_dir = os.path.join(os.path.dirname(__file__), "")
+input_dir = os.path.join(os.path.dirname(__file__), "input_params")
 
 Estimated_Quality_score_df = pd.read_csv(os.path.join(input_dir, "estimated_quality_scores_1634725968.csv"))
 Master_df = pd.read_csv(os.path.join(input_dir,'MASTER_CAMPAIGN_AD_GROUP_QUERY_results_1634725968.csv'))
