@@ -1,0 +1,15 @@
+venv/
+
+# Local credentials and environment files
+google-ads.yaml
+.env
+.env.*
+
+# Generated model artifacts and notebook output
+*.pkl
+*.nbconvert.ipynb
+
+# Python caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/

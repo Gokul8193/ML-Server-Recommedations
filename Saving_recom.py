@@ -2,24 +2,45 @@ import json
 import os
 import pandas as pd
 from datetime import datetime
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Paths to files
-clicks_json_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/best_clicks_low_cpc_input_changes_top5.json"
-conversions_json_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/ranked_filtered_top5_conversions.json"
-geotargets_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/geotargets-2025-10-29.csv"
+# recom7_2.py writes these relative to its CWD (which the pipeline sets to
+# input_params/) with THESE exact names — must match or the files are never found
+clicks_json_path = os.path.join(
+    BASE_DIR, "input_params", "best_clicks_low_cpc_input_changes_top5.json"
+)
+conversions_json_path = os.path.join(
+    BASE_DIR, "input_params", "ranked_filtered_top5_conversions.json"
+)
 
-# Output file paths
-clicks_unique_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.json"
-conversions_unique_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.json"
-clicks_unique_csv_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.csv"
-conversions_unique_csv_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.csv"
+# Manually-supplied Google geo-targets reference file. Rename whatever you
+# download to just "geotargets.csv" and drop it in input_params/ — avoids
+# having to edit this path every time Google reissues the file with a new date.
+geotargets_path = os.path.join(BASE_DIR, "input_params", "geotargets.csv")
+
+# Output file paths — same folder API2.py reads from
+SCHEDULED_DIR = os.path.join(BASE_DIR, "input_params", "Scheduled")
+os.makedirs(SCHEDULED_DIR, exist_ok=True)
+
+clicks_unique_path = os.path.join(SCHEDULED_DIR, "clicks_unique_values_minori.json")
+conversions_unique_path = os.path.join(SCHEDULED_DIR, "conversions_unique_values_minori.json")
+clicks_unique_csv_path = os.path.join(SCHEDULED_DIR, "clicks_unique_values_minori.csv")
+conversions_unique_csv_path = os.path.join(SCHEDULED_DIR, "conversions_unique_values_minori.csv")
 
 
 def load_geotargets():
     """Load and process geotargets CSV file"""
-    df = pd.read_csv(geotargets_path)
-    df['Criteria ID'] = df['Criteria ID'].astype(str)
-    return df
+    if not os.path.exists(geotargets_path):
+        print(f"Warning: Geotargets file not found at {geotargets_path}")
+        print(f"Geographic conversions will be skipped.")
+        return None
+    try:
+        df = pd.read_csv(geotargets_path)
+        df['Criteria ID'] = df['Criteria ID'].astype(str)
+        return df
+    except Exception as e:
+        print(f"Error loading geotargets: {e}")
+        return None
 
 
 def convert_device_values(values):
@@ -43,6 +64,8 @@ def convert_device_values(values):
 
 def convert_geo_values(values, geotargets_df):
     """Convert geographic target constants to detailed info"""
+    if geotargets_df is None:
+        return values
     converted = []
     for value in values:
         if isinstance(value, str):
@@ -169,25 +192,31 @@ def update_with_customer_id(json_path, csv_path):
     print(f"Added Customer_id to {csv_path} and {json_path}")
 
 
-# Load geotargets data
+# Load geotargets data (optional - script will continue without it)
 geotargets_df = load_geotargets()
 
 # Process clicks JSON
-clicks_data = load_json_data(clicks_json_path)
-if clicks_data:
-    clicks_unique = process_data(clicks_data, geotargets_df)
-    with open(clicks_unique_path, 'w') as f:
-        json.dump(clicks_unique, f, indent=2)
-    print(f"Processed clicks data saved to {clicks_unique_path}")
-    json_to_table(clicks_unique, clicks_unique_csv_path)
-    update_with_customer_id(clicks_unique_path, clicks_unique_csv_path)
+if os.path.exists(clicks_json_path):
+    clicks_data = load_json_data(clicks_json_path)
+    if clicks_data:
+        clicks_unique = process_data(clicks_data, geotargets_df)
+        with open(clicks_unique_path, 'w') as f:
+            json.dump(clicks_unique, f, indent=2)
+        print(f"Processed clicks data saved to {clicks_unique_path}")
+        json_to_table(clicks_unique, clicks_unique_csv_path)
+        update_with_customer_id(clicks_unique_path, clicks_unique_csv_path)
+else:
+    print(f"Clicks JSON file not found at {clicks_json_path}")
 
 # Process conversions JSON
-conversions_data = load_json_data(conversions_json_path)
-if conversions_data:
-    conversions_unique = process_data(conversions_data, geotargets_df)
-    with open(conversions_unique_path, 'w') as f:
-        json.dump(conversions_unique, f, indent=2)
-    print(f"Processed conversions data saved to {conversions_unique_path}")
-    json_to_table(conversions_unique, conversions_unique_csv_path)
-    update_with_customer_id(conversions_unique_path, conversions_unique_csv_path)
+if os.path.exists(conversions_json_path):
+    conversions_data = load_json_data(conversions_json_path)
+    if conversions_data:
+        conversions_unique = process_data(conversions_data, geotargets_df)
+        with open(conversions_unique_path, 'w') as f:
+            json.dump(conversions_unique, f, indent=2)
+        print(f"Processed conversions data saved to {conversions_unique_path}")
+        json_to_table(conversions_unique, conversions_unique_csv_path)
+        update_with_customer_id(conversions_unique_path, conversions_unique_csv_path)
+else:
+    print(f"Conversions JSON file not found at {conversions_json_path}")

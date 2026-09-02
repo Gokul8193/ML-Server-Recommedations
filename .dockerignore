@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+input_params/
+input_params_minori/
+*.csv
+*.json
+google-ads.yaml
+.env

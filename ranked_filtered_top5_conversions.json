@@ -1,0 +1,121 @@
+{
+  "campaign_id": [
+    "22988974238",
+    "22988974238",
+    "22988974238",
+    "22988974238",
+    "22988974238"
+  ],
+  "ad_group_id": [
+    188063211507.0,
+    188063211507.0,
+    188063211507.0,
+    188063211507.0,
+    188063211507.0
+  ],
+  "Date_Day": [
+    31,
+    23,
+    7,
+    1,
+    7
+  ],
+  "Keyword_Quality_Estimated_Quality_Score": [
+    10,
+    3,
+    8,
+    6,
+    2
+  ],
+  "resource_name": [
+    "customers/1634725968/adScheduleViews/22988974238~333696",
+    "customers/1634725968/adScheduleViews/22988974238~333696",
+    "customers/1634725968/adScheduleViews/22988974238~333696",
+    "customers/1634725968/adScheduleViews/22988974238~333696",
+    "customers/1634725968/adScheduleViews/22988974238~333696"
+  ],
+  "ad_schedule_start_hour": [
+    0,
+    15,
+    6,
+    9,
+    12
+  ],
+  "ad_schedule_end_hour": [
+    9,
+    12,
+    15,
+    3,
+    12
+  ],
+  "search_term_search_term": [
+    "affiliate marketing",
+    "ad agency near me",
+    "advertising company near me",
+    "ad agency near me",
+    "advertising company near me"
+  ],
+  "Keyword_Quality_KW_types": [
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "bidding_strategy_bidding_strategy_type": [
+    null,
+    "TARGET_SPEND",
+    null,
+    null,
+    null
+  ],
+  "bid_Adjustments_device_type": [
+    "2.0",
+    "name_TABLET",
+    "3.0",
+    null,
+    "4.0"
+  ],
+  "day_of_week": [
+    null,
+    null,
+    "THURSDAY",
+    "THURSDAY",
+    null
+  ],
+  "geographic_report_geo_target_constant": [
+    "2008.0",
+    "2008.0",
+    "2008.0",
+    "2008.0",
+    "2008.0"
+  ],
+  "Device_performance_Device": [
+    "TABLET",
+    null,
+    null,
+    null,
+    "MOBILE"
+  ],
+  "Keyword_performance_Keyword_Match_Type": [
+    null,
+    null,
+    "BROAD",
+    "BROAD",
+    "BROAD"
+  ],
+  "keywords_meta_match_type": [
+    null,
+    "BROAD",
+    "BROAD",
+    null,
+    "BROAD"
+  ],
+  "cost_usd": [
+    2540.530000001085,
+    2540.530000001085,
+    2540.530000001085,
+    2540.530000001085,
+    2540.530000001085
+  ]
+}

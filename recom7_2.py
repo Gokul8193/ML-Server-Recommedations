@@ -145,7 +145,7 @@ for col in final_df.select_dtypes(include='bool').columns:
 # -------------------------------------------
 # 8. Define targets and features
 # -------------------------------------------
-target_cols = ['impressions', 'clicks', 'cost_usd', 'ctr', 'average_cpc_usd','conversions_Master','cost_per_conversion_usd']
+target_cols = ['impressions', 'clicks', 'cost_usd', 'ctr', 'average_cpc_usd', 'ad_performance_Conversions']
 for c in target_cols:
     if c not in final_df.columns:
         raise KeyError(f"Missing target column: {c}")
@@ -156,9 +156,9 @@ feature_cols = list(X.columns)
 # -------------------------------------------
 # 9. Load models and ensemble weights
 # -------------------------------------------
-rf_model = joblib.load('artifacts/saved_models/rf_multi_model.pkl')
-xgb_model = joblib.load('artifacts/saved_models/xgb_multi_model.pkl')
-ensemble_weights = joblib.load('artifacts/saved_models/ensemble_weights.pkl')
+rf_model = joblib.load('artifacts3/models/rf_multi_model.pkl')
+xgb_model = joblib.load('artifacts3/models/xgb_multi_model.pkl')
+ensemble_weights = joblib.load('artifacts3/models/ensemble_weights.pkl')
 LOG_TRANSFORMED = True
 
 # -------------------------------------------
@@ -335,8 +335,26 @@ for n in n_list:
         continue
     preds, full_history = track_predictions(manual_input_df)
     decoded_run_df = decode_df(full_history.copy())
+    
+    # Remove duplicate columns, keeping only the first occurrence
+    if decoded_run_df.columns.duplicated().any():
+        decoded_run_df = decoded_run_df.loc[:, ~decoded_run_df.columns.duplicated(keep='first')]
+    
     decoded_run_df['n'] = n
     all_full_runs.append(decoded_run_df)
+
+# Ensure all DataFrames have the same columns before concatenating
+if all_full_runs:
+    # Get all unique columns across all DataFrames
+    all_cols = set()
+    for df in all_full_runs:
+        all_cols.update(df.columns)
+    all_cols = sorted(list(all_cols))
+    
+    # Reindex all DataFrames to have the same columns
+    for i, df in enumerate(all_full_runs):
+        all_full_runs[i] = df.reindex(columns=all_cols)
+
 final_full_decoded_df = pd.concat(all_full_runs, ignore_index=True)
 def robust_decode_negative_keywords(value, le_neg):
     if isinstance(value, (int, float, np.integer, np.floating)):
@@ -425,13 +443,19 @@ print(f"Appended top 3 rows to {append_file}")
 
 # ----------- CONVERSIONS BLOCK BEGINS -----------
 # Analyze for high conversions and low cost_per_conversion_usd
-conversion_threshold = df_preds['conversions_Master'].quantile(0.95)
+# Calculate cost per conversion (handle division by zero)
+df_preds['cost_per_conversion_usd'] = df_preds.apply(
+    lambda row: row['cost_usd'] / row['ad_performance_Conversions'] if row['ad_performance_Conversions'] > 0 else 0,
+    axis=1
+)
+
+conversion_threshold = df_preds['ad_performance_Conversions'].quantile(0.95)
 costconv_threshold = df_preds['cost_per_conversion_usd'].quantile(0.10)
 filtered_conv_df = df_preds[
-    (df_preds['conversions_Master'] >= conversion_threshold) &
+    (df_preds['ad_performance_Conversions'] >= conversion_threshold) &
     (df_preds['cost_per_conversion_usd'] <= costconv_threshold)
 ]
-sorted_conv_df = filtered_conv_df.sort_values(by=['conversions_Master', 'cost_per_conversion_usd'], ascending=[False, True])
+sorted_conv_df = filtered_conv_df.sort_values(by=['ad_performance_Conversions', 'cost_per_conversion_usd'], ascending=[False, True])
 top_20_conv_rows = sorted_conv_df.head(100)
 
 # Always append top 3 rows to new file on each run for conversions
@@ -455,7 +479,7 @@ with open('ranked_filtered_top5_conversions.json', 'w') as f:
     f.write(json_str_conv)
 print("Saved best conversions/cost JSON to ranked_filtered_top5_conversions.json")
 print("Top 20 input variations maximizing conversions while minimizing cost per conversion (usd):")
-print(top_20_conv_rows[['conversions_Master', 'cost_per_conversion_usd']])
+print(top_20_conv_rows[['ad_performance_Conversions', 'cost_per_conversion_usd']])
 top_20_conv_rows.to_csv('best_conversions_low_cost_input_changes.csv', index=False)
 print("Saved best conversions vs cost balanced inputs to best_conversions_low_cost_input_changes.csv")
 print(f"Appended top 3 rows to {append_conv_file}")

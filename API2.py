@@ -10,6 +10,28 @@ CONVERSIONS_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/
 CLICKS_MINORI_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.csv"
 CONVERSIONS_MINORI_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.csv"
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCHEDULED_DIR = os.path.join(BASE_DIR, "input_params", "Scheduled")
+CLICKS_CSV = os.path.join(
+    SCHEDULED_DIR,
+    "clicks_unique_values.csv"
+)
+
+CONVERSIONS_CSV = os.path.join(
+    SCHEDULED_DIR,
+    "conversions_unique_values.csv"
+)
+
+CLICKS_MINORI_CSV = os.path.join(
+    SCHEDULED_DIR,
+    "clicks_unique_values_minori.csv"
+)
+
+CONVERSIONS_MINORI_CSV = os.path.join(
+    SCHEDULED_DIR,
+    "conversions_unique_values_minori.csv"
+)
+
 @app.route('/recommendation', methods=['POST'])
 def get_recommendation():
     try:

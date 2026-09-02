@@ -1,0 +1,36 @@
+services:
+
+  api:
+    build: .
+    container_name: google_ads_api
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ./input_params:/app/input_params
+      - ./artifacts3:/app/artifacts3
+      - ./google-ads.yaml:/app/google-ads.yaml:ro
+
+    environment:
+      TZ: Asia/Kolkata
+
+    command: python API2.py
+
+
+  scheduler:
+    build: .
+    container_name: google_ads_scheduler
+    restart: unless-stopped
+
+    volumes:
+      - ./input_params:/app/input_params
+      - ./artifacts3:/app/artifacts3
+      - ./google-ads.yaml:/app/google-ads.yaml:ro
+      - ./geotargets.csv:/app/input_params/geotargets.csv:ro
+
+    environment:
+      TZ: Asia/Kolkata
+
+    command: python daily_run.py
