@@ -3,16 +3,34 @@ import os
 import pandas as pd
 from datetime import datetime
 
-# Paths to files
-clicks_json_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/best_clicks_low_cpc_input_changes_top5.json"
-conversions_json_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/ranked_filtered_top5_conversions.json"
-geotargets_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params_minori/SCheduled/geotargets-2025-10-29.csv"
+# ---------------------------------------------------------------------------
+# Path configuration — all hardcoded desktop paths replaced with env vars.
+#
+#   PIPELINE_DIR  : where recom7_2.py writes its JSON outputs (input_params/)
+#   DATA_DIR      : where final CSVs land for the Flask API to read
+#   GEOTARGETS_PATH: static geo-target lookup CSV
+#
+# In Docker these are set via environment variables (see .env.example).
+# Locally they default to folders next to this script so nothing breaks.
+# ---------------------------------------------------------------------------
+_script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Output file paths
-clicks_unique_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.json"
-conversions_unique_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.json"
-clicks_unique_csv_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.csv"
-conversions_unique_csv_path = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.csv"
+PIPELINE_DIR    = os.environ.get("PIPELINE_DIR",    os.path.join(_script_dir, "input_params"))
+DATA_DIR        = os.environ.get("DATA_DIR",         os.path.join(_script_dir, "data"))
+GEOTARGETS_PATH = os.environ.get("GEOTARGETS_PATH",  os.path.join(_script_dir, "data", "geotargets.csv"))
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# Input files (produced by recom7_2.py)
+clicks_json_path      = os.path.join(PIPELINE_DIR, "best_clicks_low_cpc_input_changes_top5.json")
+conversions_json_path = os.path.join(PIPELINE_DIR, "ranked_filtered_top5_conversions.json")
+geotargets_path       = GEOTARGETS_PATH
+
+# Output files (read by the Flask API via API2.py)
+clicks_unique_path         = os.path.join(DATA_DIR, "clicks_unique_values_minori.json")
+conversions_unique_path    = os.path.join(DATA_DIR, "conversions_unique_values_minori.json")
+clicks_unique_csv_path     = os.path.join(DATA_DIR, "clicks_unique_values_minori.csv")
+conversions_unique_csv_path = os.path.join(DATA_DIR, "conversions_unique_values_minori.csv")
 
 
 def load_geotargets():

@@ -4,11 +4,18 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Paths to CSV files
-CLICKS_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values.csv"
-CONVERSIONS_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values.csv"
-CLICKS_MINORI_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/clicks_unique_values_minori.csv"
-CONVERSIONS_MINORI_CSV = "/home/minorilabs/Desktop/Google ads Client/google-ads-python/examples/reporting/input_params/SCheduled/conversions_unique_values_minori.csv"
+# Paths to CSV files — configurable via DATA_DIR env var.
+# Default: a `data/` folder next to this script (works locally and in Docker).
+_DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+CLICKS_CSV          = os.path.join(_DATA_DIR, "clicks_unique_values.csv")
+CONVERSIONS_CSV     = os.path.join(_DATA_DIR, "conversions_unique_values.csv")
+CLICKS_MINORI_CSV   = os.path.join(_DATA_DIR, "clicks_unique_values_minori.csv")
+CONVERSIONS_MINORI_CSV = os.path.join(_DATA_DIR, "conversions_unique_values_minori.csv")
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({"status": "ok"}), 200
+
 
 @app.route('/recommendation', methods=['POST'])
 def get_recommendation():

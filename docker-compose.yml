@@ -1,0 +1,24 @@
+services:
+  ml-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      # Persistent data volume: pipeline writes here, API reads from here.
+      # Populate by running the pipeline separately or mounting a pre-filled dir.
+      - ml_data:/app/data
+      - ml_pipeline:/app/input_params
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  ml_data:
+  ml_pipeline:

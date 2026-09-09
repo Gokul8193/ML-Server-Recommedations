@@ -399,7 +399,7 @@ available_columns = [col for col in selected_columns if col in top_20_rows.colum
 top3_rows = top_20_rows.head(3)  # Select top 3 rows
 
 # Always append top 3 rows to new file on each run
-append_file = 'top3_clicks_low_cpc_history.csv'
+append_file = os.path.join(input_dir, 'top3_clicks_low_cpc_history.csv')
 if not os.path.isfile(append_file):
     top3_rows.to_csv(append_file, index=False, mode='w')
 else:
@@ -412,13 +412,13 @@ for col in available_columns:
     output_dict[col] = vals
 json_str = json.dumps(output_dict, indent=2)
 print(json_str)
-# Save JSON for best clicks/CPC
-with open('best_clicks_low_cpc_input_changes_top5.json', 'w') as f:
+# Save JSON for best clicks/CPC — written to input_dir so Saving_recom.py can find it
+with open(os.path.join(input_dir, 'best_clicks_low_cpc_input_changes_top5.json'), 'w') as f:
     f.write(json_str)
 print("Saved best clicks/CPC JSON to ranked_filtered_top5.json")
 print("Top 20 input variations maximizing clicks while minimizing average CPC:")
 print(top_20_rows[['clicks', 'average_cpc_usd']])
-top_20_rows.to_csv('best_clicks_low_cpc_input_changes.csv', index=False)
+top_20_rows.to_csv(os.path.join(input_dir, 'best_clicks_low_cpc_input_changes.csv'), index=False)
 print("Saved best clicks vs CPC balanced inputs to best_clicks_low_cpc_input_changes.csv")
 print(f"Appended top 3 rows to {append_file}")
 # ----------- MODIFICATION ENDS HERE ------------
@@ -436,7 +436,7 @@ top_20_conv_rows = sorted_conv_df.head(100)
 
 # Always append top 3 rows to new file on each run for conversions
 top3_conv_rows = top_20_conv_rows.head(3)
-append_conv_file = 'top3_conversions_clicks_low_cost_history.csv'
+append_conv_file = os.path.join(input_dir, 'top3_conversions_clicks_low_cost_history.csv')
 if not os.path.isfile(append_conv_file):
     top3_conv_rows.to_csv(append_conv_file, index=False, mode='w')
 else:
@@ -450,13 +450,13 @@ for col in available_columns:
     output_conv_dict[col] = vals
 json_str_conv = json.dumps(output_conv_dict, indent=2)
 print(json_str_conv)
-# Save JSON for best conversions/cost
-with open('ranked_filtered_top5_conversions.json', 'w') as f:
+# Save JSON for best conversions/cost — written to input_dir so Saving_recom.py can find it
+with open(os.path.join(input_dir, 'ranked_filtered_top5_conversions.json'), 'w') as f:
     f.write(json_str_conv)
 print("Saved best conversions/cost JSON to ranked_filtered_top5_conversions.json")
 print("Top 20 input variations maximizing conversions while minimizing cost per conversion (usd):")
 print(top_20_conv_rows[['conversions_Master', 'cost_per_conversion_usd']])
-top_20_conv_rows.to_csv('best_conversions_low_cost_input_changes.csv', index=False)
+top_20_conv_rows.to_csv(os.path.join(input_dir, 'best_conversions_low_cost_input_changes.csv'), index=False)
 print("Saved best conversions vs cost balanced inputs to best_conversions_low_cost_input_changes.csv")
 print(f"Appended top 3 rows to {append_conv_file}")
 # ----------- CONVERSIONS BLOCK ENDS -----------
